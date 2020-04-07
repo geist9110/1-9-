@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 
 void add_new(void); // 새로운 연락처 추가
@@ -23,14 +24,14 @@ void start(int *a) {
 	printf("          ==========================\n");
 	printf("          [1] Add a new Contact\n");
 	printf("          [2] List all Contact\n");
-	printf("          [3] Search for contacr\n");
+	printf("          [3] Search for contact\n");
 	printf("          [4] Edit a Contact\n");
-	printf("          [5] Delete a Contacr\n");
+	printf("          [5] Delete a Contact\n");
 	printf("          [0] Exit\n");
 	printf("          ==========================\n");
 	printf("          Enter the choice:");
 	scanf_s("%d", &b); // 메인 화면에서 각각의 화면으로 넘어가기 위해 체크
-	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+	printf("\n");
 
 	if (b == 1) {
 		add_new();
@@ -55,17 +56,64 @@ void start(int *a) {
 }
 
 void add_new(void) { // 새로운 연락처 추가
-	printf("1");
+
+	char temp[100]; // 임시저장용
+
+	FILE* fp = fopen("contact list.txt", "a"); // contact list.txt 라는 메모장을 엶
+
+	printf("Name : ");
+	scanf("%s", &temp); // 이름값을 temp에 받음
+	fputs(temp, fp); // temp값을 txt파일에 넣음
+
+	fputs("\n", fp); // 줄바꿈
+
+	printf("Phone Number : ");
+	scanf("%s", &temp);
+	fputs(temp, fp);
+	fputs("\n", fp);
+	
+	printf("Address : ");
+	scanf("%s", &temp);
+	fputs(temp, fp);
+	fputs("\n", fp);
+
+	printf("Email : ");
+	scanf("%s", &temp);
+	fputs(temp, fp);
+	fputs("\n", fp);
+
+	fclose(fp); // 파일 닫기
+	printf("\n\n");
 }
 
 void list(void) { // 연락처 보여주기
+	char temp[100]; // 임시 변수
+	int i; // 반복문용 i
+
 	printf("          ==========================\n");
 	printf("              LIST OF CONTACTS\n");
 	printf("          ==========================\n\n");
-	printf(" Name          Phone No          Address          E-maid ad\n");
+	printf(" Name          Phone No          Address          E-mail\n");
 	printf(" ===========================================================\n");
 
-	printf(" ===========================================================\n");
+	FILE* fp = fopen("contact list.txt", "r"); // contact list를 읽기모드로 엶
+
+	for (i = 1; i <= 4; i++) {
+		fgets(temp, 200, fp); // temp에 contact list의 첫번째 줄을 읽어옴
+		printf("Name      : %s\n", temp);
+
+		fgets(temp, 200, fp); // temp에 contact list의 두번째 줄을 읽어옴
+		printf("Phone     : %s\n", temp);
+
+		fgets(temp, 200, fp);
+		printf("Address   : %s\n", temp);
+
+		fgets(temp, 200, fp);
+		printf("Email     : %s\n", temp);
+	}
+
+	fclose(fp);
+	printf(" ===========================================================\n\n");
 }
 
 void search(void) { // 연락처 검색
