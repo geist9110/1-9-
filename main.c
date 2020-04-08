@@ -1,13 +1,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
+#include <string.h>
 
 void add_new(void); // 새로운 연락처 추가
 void list(void); // 연락처 보여주기
 void search(void); // 연락처 검색
 void edit(void); // 연락처 수정
 void delete_contact(void); // 연락처 삭제
-void Exit(int *a); // 나가기
-void start(int *a); // 메인 화면 함수
+void Exit(int* a); // 나가기
+void start(int* a); // 메인 화면 함수
 
 main(void) {
 	int a = 1; // 반복문 용 a
@@ -16,7 +17,7 @@ main(void) {
 	}
 }
 
-void start(int *a) {
+void start(int* a) {
 	int b = 0;
 
 	printf(" **** Welcome to Contact Management System ****\n\n");
@@ -29,7 +30,7 @@ void start(int *a) {
 	printf("          [5] Delete a Contact\n");
 	printf("          [0] Exit\n");
 	printf("          ==========================\n");
-	printf("          Enter the choice:");
+	printf("          Enter the choice : ");
 	scanf_s("%d", &b); // 메인 화면에서 각각의 화면으로 넘어가기 위해 체크
 	printf("\n");
 
@@ -71,7 +72,7 @@ void add_new(void) { // 새로운 연락처 추가
 	scanf("%s", &temp);
 	fputs(temp, fp);
 	fputs("\n", fp);
-	
+
 	printf("Address : ");
 	scanf("%s", &temp);
 	fputs(temp, fp);
@@ -90,30 +91,36 @@ void list(void) { // 연락처 보여주기
 	char temp[100]; // 임시 변수
 	int i; // 반복문용 i
 
-	printf("          ==========================\n");
-	printf("              LIST OF CONTACTS\n");
-	printf("          ==========================\n\n");
-	printf(" Name          Phone No          Address          E-mail\n");
-	printf(" ===========================================================\n");
-
 	FILE* fp = fopen("contact list.txt", "r"); // contact list를 읽기모드로 엶
 
-	for (i = 1; i <= 4; i++) {
-		fgets(temp, 200, fp); // temp에 contact list의 첫번째 줄을 읽어옴
-		printf("Name      : %s\n", temp);
-
-		fgets(temp, 200, fp); // temp에 contact list의 두번째 줄을 읽어옴
-		printf("Phone     : %s\n", temp);
-
-		fgets(temp, 200, fp);
-		printf("Address   : %s\n", temp);
-
-		fgets(temp, 200, fp);
-		printf("Email     : %s\n", temp);
+	if (!fp) {
+		perror(" contact list가 존재하지 않습니다.\n");
 	}
+	
+	else {
+		printf("          ==========================\n");
+		printf("              LIST OF CONTACTS\n");
+		printf("          ==========================\n\n");
+		printf(" Name          Phone No          Address          E-mail\n");
+		printf(" ===========================================================\n\n");
 
-	fclose(fp);
-	printf(" ===========================================================\n\n");
+
+		while (fgets(temp, 100, fp) != NULL) {
+			printf("Name      : %s", temp);
+
+			fgets(temp, 100, fp);
+			printf("Phone     : %s", temp);
+
+			fgets(temp, 100, fp);
+			printf("Address   : %s", temp);
+
+			fgets(temp, 100, fp);
+			printf("Email     : %s\n", temp);
+		}
+
+		fclose(fp);
+		printf(" ===========================================================\n\n");
+	}
 }
 
 void search(void) { // 연락처 검색
@@ -121,19 +128,93 @@ void search(void) { // 연락처 검색
 }
 
 void edit(void) { // 연락처 수정
-	printf("          ==========================\n");
-	printf("               EDIT A CONTACTS\n");
-	printf("          ==========================\n\n");
-	printf(" Name          Phone No          Address          E-maid ad\n");
-	printf(" ===========================================================\n");
 
-	printf(" ===========================================================\n");
+	char check[100]; // 체크용
+	char temp[100]; // contact에서 받아오는 용도
+	char name[101]; // 이름 받아오는 용도
+	int i = 0, j = 0, k = 1, col = 0;
+
+	printf("The name of the person whose information you want to change : "); // 변경하고 싶은 사람의 이름
+	scanf("%s", &name);
+
+	strcpy(check, name);
+	strcat(check, "\n"); // strcmp를 위해서 \n를 더해줌
+
+
+	FILE* fa = fopen("temp.txt", "w");
+	fclose(fa);
+
+	FILE* ff = fopen("contact list.txt", "r"); // contact.txt의 행의 개수 세기
+	while (fgets(temp, 100, ff) != NULL) {
+		col++;
+	}
+	fclose(ff);
+
+	for (i; i < col - 3; i++) { // 찾는 이름 제외한 나머지를 temp로 복사
+
+		FILE* fc = fopen("contact list.txt", "r"); // contact.txt의 각 행의 문자열을 가져옴
+		for (j = 0; j < k; j++) {
+			fgets(temp, 100, fc);
+		}
+
+		if (!strcmp(temp, check)) { // check 와 contact를 비교
+			fclose(fc);
+			k += 3;
+		}
+
+		else {
+			fclose(fc);
+			FILE* fd = fopen("temp.txt", "a"); // 가져온 문자열을 임시 파일에 집어넣음
+			fputs(temp, fd);
+			fclose(fd);
+		}
+		k += 1;
+	}
+
+	k = 1, i = 0; // k와 i 초기화
+	FILE* fb = fopen("contact list.txt", "w"); // contact list 초기화
+	fclose(fb);
+
+
+	for (i; i < col - 4; i++) { // temp.txt에서 contact.txt로 이동
+
+		FILE* fe = fopen("temp.txt", "r"); // temp.txt의 각 행의 문자열을 가져옴
+		for (j = 0; j < k; j++) {
+			fgets(temp, 100, fe);
+		}
+		fclose(fe);
+
+		FILE* fg = fopen("contact list.txt", "a"); // 가져온 문자열을 임시 파일에 집어넣음
+		fputs(temp, fg);
+		fclose(fg);
+
+		k += 1;
+	}
+
+	FILE* fh = fopen("contact list.txt", "a");
+	fputs(name, fh);
+	fputs("\n", fh);
+	printf("%s's Phone Number : ", name);
+	scanf("%s", &temp);
+	fputs(temp, fh);
+	fputs("\n", fh);
+
+	printf("%s's Address : ", name);
+	scanf("%s", &temp);
+	fputs(temp, fh);
+	fputs("\n", fh);
+
+	printf("%s's Email : ", name);
+	scanf("%s", &temp);
+	fputs(temp, fh);
+	fputs("\n", fh);
+	fclose(fh);
 }
 
 void delete_contact(void) { // 연락처 삭제
 	printf("5");
 }
 
-void Exit(int *a) { // 나가기
+void Exit(int* a) { // 나가기
 	*a = 2;
 }
