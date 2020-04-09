@@ -39,34 +39,26 @@ void start(int* a) {
 	scanf_s("%d", &b); // 메인 화면에서 각각의 화면으로 넘어가기 위해 체크
 	printf("\n");
 
-	switch (b) {
-	case 1:
-		add_new();
-		break;
-
-	case 2:
-		list();
-		break;
-
-	case 3:
-		search();
-		break;
-
-	case 4:
-		edit();
-		break;
-
-	case 5:
-		delete_contact();
-		break;
-
-	case 6:
-		clearFile();
-		break;
-
-	case 0:
-		Exit(*a);
-		break;
+	if (b == 1) {
+		add_new(); // 리스트 작성으로 이동
+	}
+	else if (b == 2) {
+		list(); // 리스트 전부 보여줌
+	}
+	else if (b == 3) {
+		search(); // 리스트에서 사람이름 검색
+	}
+	else if (b == 4) {
+		edit(); // 리스트에서 정보 수정
+	}
+	else if (b == 5) {
+		delete_contact(); // 리스트에서 정보 삭제
+	}
+	else if (b == 0) {
+		Exit(*a); // 종료
+	}
+	else if (b == 6) {
+		clearFile(); // 리스트 초기화
 	}
 }
 
@@ -112,10 +104,12 @@ void list(void) { // 연락처 보여주기
 
 	FILE* fp = fopen("contact list.txt", "r"); // contact list를 읽기모드로 엶
 
-	if (!fp) {
+	if (!fp) { // fopen시 r모드에서 오류 방지
+		Design2();
 		perror(" contact list가 존재하지 않습니다.\n");
+		printf("\n");
+		Design2();
 	}
-
 	else {
 		Design1(title);
 		printf("\n");
@@ -153,41 +147,69 @@ void search(void) { // 연락처 검색
 	printf(" Name of the person you want to find : ");
 	scanf("%s", &name);
 
-	if (S_C(name)) {
+	if (!strcmp(name, "999")) { // 999 이스터에그
+		printf(" Name : 비둘기\n");
+		printf(" Define : 비둘기목의 새를 통틀어 이르는 말\n");
+		printf(" Address : 용지에 대량 서식중\n");
+		printf(" Characteristic : 걸어다니는걸 좋아함\n\n");
+		Design2();
+	}
 
-		FILE* ff = fopen("contact list.txt", "r"); // contact.txt의 행의 개수 세기
-		while (fgets(temp, 100, ff) != NULL) {
-			col++;
+	else if (!strcmp(name, "easter_egg")) { // easter egg 이스터에그
+		printf(" Name : 닭\n");
+		printf(" Define : 머리에 붉은 볏이 있고 날개는 퇴화하여 잘 날지 못하며 다리는 튼튼하다\n");
+		printf(" Address : 닭장 속\n");
+		printf(" Characteristic : 맛있음\n\n");
+		Design2();
+	}
+
+	else {
+		FILE* f1 = fopen("contact list.txt", "r"); // contact list를 읽기모드로 엶
+
+		if (!f1) {  // fopen시 r모드에서 오류 방지
+			perror(" contact list가 존재하지 않습니다.\n");
+			printf("\n");
+			Design2();
 		}
-		fclose(ff);
+		else {
+			fclose(f1);
+			if (S_C(name)) {
 
-		FILE* fp = fopen("contact list.txt", "r");
+				FILE* ff = fopen("contact list.txt", "r"); // contact.txt의 행의 개수 세기
+				while (fgets(temp, 100, ff) != NULL) {
+					col++;
+				}
+				fclose(ff);
 
-		strcat(name, "\n"); // strcmp를 위해서 \n를 더해줌
+				FILE* fp = fopen("contact list.txt", "r");
 
-		for (i = 0; i < col; i++) {
-			fgets(temp, 100, fp);
+				strcat(name, "\n"); // strcmp를 위해서 \n를 더해줌
 
-			if (!strcmp(temp, name)) { // check 와 contact를 비교
-				printf(" Name : %s", temp);
+				for (i = 0; i < col; i++) {
+					fgets(temp, 100, fp);
 
-				fgets(temp, 100, fp);
-				printf(" Phone : %s", temp);
+					if (!strcmp(temp, name)) { // check 와 contact를 비교
+						printf(" Name : %s", temp);
 
-				fgets(temp, 100, fp);
-				printf(" Adress : %s", temp);
+						fgets(temp, 100, fp);
+						printf(" Phone : %s", temp);
 
-				fgets(temp, 100, fp);
-				printf(" Email : %s\n", temp);
+						fgets(temp, 100, fp);
+						printf(" Address : %s", temp);
+
+						fgets(temp, 100, fp);
+						printf(" Email : %s\n", temp);
+						Design2();
+						break;
+					}
+				}
+				fclose(fp);
+			}
+			else {
+				printf(" Name does not exist.\n\n");
 				Design2();
-				break;
 			}
 		}
-		fclose(fp);
-	}
-	else {
-		printf(" Name does not exist.\n\n");
-		Design2();
 	}
 }
 
@@ -203,35 +225,45 @@ void edit(void) { // 연락처 수정
 	printf(" The name of the person whose information you want to change : "); // 변경하고 싶은 사람의 이름
 	scanf("%s", &name);
 
-	if (S_C(name)) {
-		D_C(name); // contact list에서 원하는 사람의 이름 삭제
+	FILE* f1 = fopen("contact list.txt", "r"); // contact list를 읽기모드로 엶
 
-		FILE* fh = fopen("contact list.txt", "a"); // 마지막에 원하는 사람의 정보를 추가 입력
-		fputs(name, fh);
-		fputs("\n", fh);
-		printf(" %s's Phone Number : ", name);
-		scanf("%s", &temp);
-		fputs(temp, fh);
-		fputs("\n", fh);
-
-		printf(" %s's Address : ", name);
-		scanf("%s", &temp);
-		fputs(temp, fh);
-		fputs("\n", fh);
-
-		printf(" %s's Email : ", name);
-		scanf("%s", &temp);
-		fputs(temp, fh);
-		fputs("\n", fh);
-		fclose(fh);
-
+	if (!f1) {
+		perror(" contact list가 존재하지 않습니다.\n");
 		printf("\n");
 		Design2();
 	}
-
 	else {
-		printf(" Name does not exist.\n\n");
-		Design2();
+		fclose(f1);
+		if (S_C(name)) {
+			D_C(name); // contact list에서 원하는 사람의 이름 삭제
+
+			FILE* fh = fopen("contact list.txt", "a"); // 마지막에 원하는 사람의 정보를 추가 입력
+			fputs(name, fh);
+			fputs("\n", fh);
+			printf(" %s's Phone Number : ", name);
+			scanf("%s", &temp);
+			fputs(temp, fh);
+			fputs("\n", fh);
+
+			printf(" %s's Address : ", name);
+			scanf("%s", &temp);
+			fputs(temp, fh);
+			fputs("\n", fh);
+
+			printf(" %s's Email : ", name);
+			scanf("%s", &temp);
+			fputs(temp, fh);
+			fputs("\n", fh);
+			fclose(fh);
+
+			printf("\n");
+			Design2();
+		}
+
+		else {
+			printf(" Name does not exist.\n\n");
+			Design2();
+		}
 	}
 }
 
@@ -245,15 +277,25 @@ void delete_contact(void) { // 연락처 삭제
 	printf(" The name of the person who wants to delete the information : "); // 삭제하고 싶은 사람 이름
 	scanf("%s", &name);
 
-	if (S_C(name)) {
-		D_C(name);
+	FILE* f1 = fopen("contact list.txt", "r"); // contact list를 읽기모드로 엶
 
+	if (!f1) {
+		perror(" contact list가 존재하지 않습니다.\n");
 		printf("\n");
 		Design2();
 	}
 	else {
-		printf(" Name does not exist.\n\n");
-		Design2();
+		fclose(f1);
+		if (S_C(name)) {
+			D_C(name);
+
+			printf("\n");
+			Design2();
+		}
+		else {
+			printf(" Name does not exist.\n\n");
+			Design2();
+		}
 	}
 }
 
